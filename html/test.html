@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"><link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+    <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/locale/easyui-lang-zh_CN.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .header ul{
+            list-style-type: none;
+            margin:0px;
+            padding:0px;
+        }
+        .header li {
+            float:left;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="width:1000px;height:400px" align="center"></div>
+<div class="header">
+    <ul>
+        <li><button id="goflight" class="btn btn-primary">航班管理</button></li>
+        <li><button id="gorecord" class="btn btn-primary">消费记录</button></li>
+        <li><button id="golog" class="btn btn-primary">日志文件</button></li>
+        <li><button id="logout" class="btn btn-primary">退出登录</button></li>
+    </ul>
+</div>
+<script type="text/javascript">
+    window.onload=function (){
+        var str={};
+        $.ajax({
+            url : "http://localhost:8080/flight/gettest",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                sessionStorage.setItem("a1",datas.l1.a1);
+                sessionStorage.setItem("a2",datas.l1.a2);
+                sessionStorage.setItem("a3",datas.l1.a3);
+                sessionStorage.setItem("a4",datas.l1.a4);
+                sessionStorage.setItem("a5",datas.l1.a5);
+                sessionStorage.setItem("a6",datas.l1.a6);
+                sessionStorage.setItem("a7",datas.l1.a7);
+                sessionStorage.setItem("a8",datas.l1.a8);
+                sessionStorage.setItem("a9",datas.l1.a9);
+                sessionStorage.setItem("a10",datas.l1.a10);
+                sessionStorage.setItem("a11",datas.l1.a11);
+                sessionStorage.setItem("b1",datas.l2.b1);
+                sessionStorage.setItem("b2",datas.l2.b2);
+                sessionStorage.setItem("b3",datas.l2.b3);
+                sessionStorage.setItem("b4",datas.l2.b4);
+                sessionStorage.setItem("b5",datas.l2.b5);
+                sessionStorage.setItem("b6",datas.l2.b6);
+                sessionStorage.setItem("b7",datas.l2.b7);
+                sessionStorage.setItem("b8",datas.l2.b8);
+                sessionStorage.setItem("b9",datas.l2.b9);
+                sessionStorage.setItem("b10",datas.l2.b10);
+                sessionStorage.setItem("b11",datas.l2.b11);
+            }
+        });
+    }
+</script>
+<script>
+    var a1=parseInt(sessionStorage.getItem("a1"));
+    var a2=parseInt(sessionStorage.getItem("a2"));
+    var a3=parseInt(sessionStorage.getItem("a3"));
+    var a4=parseInt(sessionStorage.getItem("a4"));
+    var a5=parseInt(sessionStorage.getItem("a5"));
+    var a6=parseInt(sessionStorage.getItem("a6"));
+    var a7=parseInt(sessionStorage.getItem("a7"));
+    var a8=parseInt(sessionStorage.getItem("a8"));
+    var a9=parseInt(sessionStorage.getItem("a9"));
+    var a10=parseInt(sessionStorage.getItem("a10"));
+    var a11=parseInt(sessionStorage.getItem("a11"));
+    var b1=parseInt(sessionStorage.getItem("b1"));
+    var b2=parseInt(sessionStorage.getItem("b2"));
+    var b3=parseInt(sessionStorage.getItem("b3"));
+    var b4=parseInt(sessionStorage.getItem("b4"));
+    var b5=parseInt(sessionStorage.getItem("b5"));
+    var b6=parseInt(sessionStorage.getItem("b6"));
+    var b7=parseInt(sessionStorage.getItem("b7"));
+    var b8=parseInt(sessionStorage.getItem("b8"));
+    var b9=parseInt(sessionStorage.getItem("b9"));
+    var b10=parseInt(sessionStorage.getItem("b10"));
+    var b11=parseInt(sessionStorage.getItem("b11"));
+    var chart = Highcharts.chart('container',{
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Statistics of flights taking off and landing respectively in different cities'
+        },
+        subtitle: {
+            text: 'resource: Fake numbers'
+        },
+        xAxis: {
+            categories: [
+                'Beijing','Shanghai','Hangzhou','Guangzhou','Shenzhen','Chongqing','Wuhan','Tianjin','Zhengzhou','Xi an','Chengdu'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            title: {
+                text: ''
+            },
+            labels: {
+                //去掉左侧的显示
+                formatter: function(){
+                    return this.value;
+                },
+                step:1
+            }
+        },
+        tooltip: {
+            // head + 每个 point + footer 拼接成完整的 table
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+            footerFormat: '</table>',
+        },
+        plotOptions: {
+            column: {
+                borderWidth: 0,
+                //在图形上面显示
+                dataLabels: {
+                    enabled: true,
+                    color:'black'
+                }
+            },
+            series : {
+                minPointLength :2,//防止值太小图形显示不出来
+                //negativeColor:'#87CEFF',  //设置负数条形的颜色
+                //color: '#F08080'//设置显示条颜色
+                colorByPoint:true//设置不同颜色
+            }
+        },
+        series: [{
+            name: 'Takeoff',
+            data: [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11]
+        }, {
+            name: 'Land',
+            data: [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11]
+        }]
+    });
+</script>
+<script type="text/javascript">
+    $("#logout").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var str={
+            "userId" : userId
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/logout",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "login.html";
+            }
+        });
+
+    })
+</script>
+</body>
+</html>
+

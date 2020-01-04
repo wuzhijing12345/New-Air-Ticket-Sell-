@@ -1,0 +1,127 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>航班管理员界面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .header ul{
+            list-style-type: none;
+            margin:0px;
+            padding:0px;
+        }
+        .header li {
+            float:left;
+            margin: 10px;
+        }
+    </style>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<body>
+<div class="header">
+    <ul>
+        <li><button id="goflight" class="btn btn-primary">航班管理</button></li>
+        <li><button id="gorecord" class="btn btn-primary">消费记录</button></li>
+        <li><button id="logout" class="btn btn-primary">退出登录</button></li>
+    </ul>
+</div>
+<div class="row clearfix">
+    <div class="col-md-12 column">
+        <table class="table table-hover table-striped">
+            <thead>
+            <tr>
+                <th>日志编号</th>
+                <th>修改类型</th>
+                <th>航班编号</th>
+                <th>起点</th>
+                <th>终点</th>
+                <th>起飞日期</th>
+                <th>预计起飞时间</th>
+                <th>预计到达时间</th>
+                <th>候机位置</th>
+                <th>机型</th>
+                <th>经济舱票价</th>
+                <th>头等舱票价</th>
+            </tr>
+            </thead>
+            <tbody id="t1">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    window.onload=function (){
+        var str={
+        };
+        $.ajax({
+            url : "http://localhost:8080/flight/showlog",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                $str = '';
+                $.each(datas.loglist,function(i,val){
+                    $str = $str + '<tr>';
+                    $str = $str + '<td>'+val.logId+'  </td>';
+                    if(val.logtype==1){
+                        $str = $str + '<td>更新航班</td>';
+                    }
+                    else if(val.logtype==2){
+                        $str = $str + '<td>添加航班</td>';
+                    }
+                    else{
+                        $str = $str + '<td>删除航班</td>';
+                    }
+                    $str = $str + '<td>'+val.logflightId+'  </td>';
+                    $str = $str + '<td>'+val.logstart+'  </td>';
+                    $str = $str + '<td>'+val.logend+'  </td>';
+                    $str = $str + '<td>'+val.logdate+'  </td>';
+                    $str = $str + '<td>'+val.logstarttime+'  </td>';
+                    $str = $str + '<td>'+val.logendtime+'  </td>';
+                    $str = $str + '<td>'+val.logwaitsite+'  </td>';
+                    $str = $str + '<td>'+val.logfltype+'  </td>';
+                    $str = $str + '<td>'+val.loglowprice+'  </td>';
+                    $str = $str + '<td>'+val.logtopprice+'  </td>';
+                    $str = $str + '</tr>';
+                });
+                $('#t1').append($str);
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    $("#logout").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var str={
+            "userId" : userId
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/logout",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "login.html";
+            }
+        });
+    })
+</script>
+<script type="text/javascript">
+    $("#gorecord").click(function() {
+        window.location.href = "managerrecord.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#goflight").click(function() {
+        window.location.href = "managerf.html";
+    })
+</script>
+</body>
+</html>

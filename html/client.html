@@ -1,0 +1,244 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>client</title>
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="../css/styleclient2.css">
+    <script type="text/javascript" src="../js/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<body>
+<div id="page">
+    <a href="#" class="nav"><i></i></a>
+    <aside id="aside"class="border">
+        <div id="logo"></div>
+        <nav id="menu">
+            <ul>
+                <li><a href="#personal">修改个人信息</a></li>
+                <li><a href="#pay">个人账户充值</a></li>
+                <li><a href="#flight">查看已购机票</a></li>
+                <li>
+                    <button type="button" class="btn btn-primary btn-md" id="gomain">返回主页</button>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+</div>
+<div id="personal">
+    <div class="content box" >
+        <div class="row">
+            <div class="col-md-4">
+                修改个人信息
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    用 户 名：<input name="username" class="form-control" placeholder="姓名"/>
+                </div>
+                <div class="form-group">
+                    原 密 码：<input name="password" class="form-control" placeholder="密码" type="password"/>
+                </div>
+                <div class="form-group">
+                    新 密 码：<input name="newpass" class="form-control" placeholder="密码" type="password"/>
+                </div>
+                <div class="formgroup">
+                    <input type="button" class="btn btn-primary btn-md" value="修改个人信息" id="change">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    选择文件：<input type="file" name="file" width="120px">
+                </div>
+                <div class="formgroup">
+                    <input type="button" class="btn btn-primary btn-md" value="上传头像" id="upload">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="pay">
+    <div class="content box" >
+        <div class="row">
+            <div class="col-md-4">
+                账户充值
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    显示当前金额：
+                    <label id="price"></label>
+                </div>
+                <div class="form-group">
+                    充值金额：<input name="money" value="0"/>
+                </div>
+                <div class="form-group">
+                    <input type="button" class="btn btn-primary btn-md" value="充值" id="recharge">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="flight">
+    <div class="content box" >
+        <div class="row">
+            <div class="col-md-4">
+                查看已经购买的机票
+                <br>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <td>机票号</td>
+                        <td>机型</td>
+                        <td>起点</td>
+                        <td>终点</td>
+                        <td>起飞时间</td>
+                        <td>到达时间</td>
+                        <td>价格</td>
+                    </tr>
+                    </thead>
+                    <tbody id="t1">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.onload=function (){
+        var userId = sessionStorage.getItem("userId");
+        var str={
+            "userId" : userId
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/showticket",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas){
+                $str = '';
+                $.each(datas.ticketlist,function(i,val){
+                    $str = $str + '<tr>';
+                    $str = $str + '<td>'+val.flightId+'  </td>';
+                    $str = $str + '<td>'+val.fltype+'  </td>';
+                    $str = $str + '<td>'+val.start+'  </td>';
+                    $str = $str + '<td>'+val.end+'  </td>';
+                    $str = $str + '<td>'+val.starttime+'  </td>';
+                    $str = $str + '<td>'+val.endtime+'  </td>';
+                    if(val.type==1){
+                        $str = $str + '<td>'+val.topprice+'  </td>';
+                    }
+                    else
+                    {
+                        $str = $str + '<td>'+val.lowprice+'  </td>';
+                    }
+
+                    $str = $str + '</tr>';
+                });
+                $('#t1').append($str);
+            }
+        });
+        $.ajax({
+            url : "http://localhost:8080/flight/getInfo",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas){
+                document.getElementById('price').innerHTML = datas.data.money;
+            }
+        });
+        document.getElementById('logo').innerHTML = "欢迎"+sessionStorage.getItem("userName");
+        document.getElementById('images').src=sessionStorage.getItem("picture");
+    }
+</script>
+<script type="text/javascript">
+    $("#recharge").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var money = $("[name=money]").val();
+        var str={
+            "userId" : userId,
+            "money" : money
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/recharge",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "client.html";
+            }
+        });
+
+    })
+</script>
+<script type="text/javascript">
+    $("#change").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var password = $("[name=password]").val();
+        var newPassword = $("[name=newpass]").val();
+        var str={
+            "userId" : userId,
+            "oldPassword" : password,
+            "newPassword" : newPassword
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/changePassword",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                if(datas.hasOwnProperty("error")){
+                    alert(datas["error"]);
+                }
+                window.location.href = "client.html";
+            }
+        });
+
+    })
+</script>
+<script type="text/javascript">
+    $("#gomain").click(function() {
+        window.location.href = "main.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#upload").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var picture = $("[name=file]").val();
+        var str={
+            "Id" : userId,
+            "picture": picture
+        };
+        alert(picture);
+        $.ajax({
+            url : "http://localhost:8080/flight/avatar",
+            type : "post",
+            dataType:'json',
+            contentType:'application/json;charset=utf-8',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                alert(1);
+                sessionStorage.setItem("picture",datas.datas);
+                window.location.href = "client.html";
+            }
+        });
+    })
+</script>
+</body>
+</html>

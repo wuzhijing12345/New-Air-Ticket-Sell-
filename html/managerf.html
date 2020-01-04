@@ -1,0 +1,614 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>航班管理员界面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        *{padding:0px;margin:0px;}
+        .pop {  display: none;  width: 400px; min-height: 200px;  max-height: 700px;  height:500px;  position: absolute;  top: 0;  left: 0;  bottom: 0;  right: 0;  margin: auto;  padding: 25px;  z-index: 130;  border-radius: 8px;  background-color: #fff;  box-shadow: 0 3px 18px rgba(100, 0, 0, .5);  }
+        .pop1 {  display: none;  width: 400px; min-height: 200px;  max-height: 700px;  height:500px;  position: absolute;  top: 0;  left: 0;  bottom: 0;  right: 0;  margin: auto;  padding: 25px;  z-index: 130;  border-radius: 8px;  background-color: #fff;  box-shadow: 0 3px 18px rgba(100, 0, 0, .5);  }
+        .pop2 {  display: none;  width: 400px; min-height: 200px;  max-height: 700px;  height:500px;  position: absolute;  top: 0;  left: 0;  bottom: 0;  right: 0;  margin: auto;  padding: 25px;  z-index: 130;  border-radius: 8px;  background-color: #fff;  box-shadow: 0 3px 18px rgba(100, 0, 0, .5);  }
+        .pop-top{  height:20px;  width:100%;  border-bottom: 1px #E5E5E5 solid;  }
+        .pop-top h2{  float: left; }
+        .pop-top span{  float: right;  cursor: pointer;  font-weight: bold; }
+        .pop-foot{  height:10px;  line-height:10px;  width:100%;  border-top: 1px #E5E5E5 solid;  text-align: right;  }
+        .pop-cancel, .pop-ok {  padding:8px 15px;  margin:15px 5px;  border: none;  border-radius: 5px;  background-color: #337AB7;  color: #fff;  cursor:pointer;  }
+        .pop-cancel {  background-color: #FFF;  border:1px #CECECE solid;  color: #000;  }
+        .pop-content{  height: 380px;  }
+        .pop-content-left{  float: left;  }
+        .pop-content-right{  width:310px;  float: left;  padding-top:20px;  padding-left:20px;  font-size: 16px;  line-height:35px;  }
+        .bgPop{  display: none;  position: absolute;  z-index: 129;  left: 0;  top: 0;  width: 100%;  height: 100%;  background: rgba(0,0,0,.2);  }
+    </style>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-easyui-1.8.1/locale/easyui-lang-zh_CN.js"></script>
+    <style>
+        .header ul{
+            list-style-type: none;
+            margin:0px;
+            padding:0px;
+        }
+        .header li {
+            float:left;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <ul>
+        <li><button id="gorecord" class="btn btn-primary">消费记录</button></li>
+        <li><button id="golog" class="btn btn-primary">日志文件</button></li>
+        <li><button id="logout" class="btn btn-primary">退出登录</button></li>
+        <li><button id="gotest" class="btn btn-primary">数据统计</button></li>
+        <li><button id="a1" class="btn btn-primary">新增航班</button></li>
+        <li><button id="a2" class="btn btn-primary">删除航班</button></li>
+        <li><button id="a3" class="btn btn-primary">修改航班</button></li>
+        <li><input name="flight"/></li>
+        <li><button id="a4" class="btn btn-primary">搜索航班</button></li>
+    </ul>
+</div>
+<div class="row clearfix">
+    <div class="col-md-12 column">
+        <table class="table table-hover table-striped">
+            <thead>
+            <tr>
+                <th>航班编号</th>
+                <th>起点</th>
+                <th>终点</th>
+                <th>起飞日期</th>
+                <th>预计起飞时间</th>
+                <th>预计到达时间</th>
+                <th>候机位置</th>
+                <th>机型</th>
+                <th>经济舱票价</th>
+                <th>头等舱票价</th>
+            </tr>
+            </thead>
+            <tbody id="t1">
+
+            </tbody>
+        </table>
+        <table class="col-md-12">
+            <tr>
+                <td class="td2">
+                    <span id="s1"></span> 
+                    <span id="s2"></span> 
+                    <span>
+                        <button id="gofirst" class="btn btn-primary">[首页]</button>
+                        <button id="gopri" class="btn btn-primary">[上一页]</button>
+                    </span>
+                    <span>
+                        <button id="gonext" class="btn btn-primary">[下一页]</button>
+                        <button id="golast" class="btn btn-primary">[尾页]</button>
+                    </span>
+                </td>
+                <td>
+                    <span>
+                        跳到<input name="currentPage" type="text"/>页
+                        <input type="button" value="跳转" class="btn btn-primary" id="jump"/>
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!--遮罩层-->
+<div class="bgPop"></div>
+<!--弹出框-->
+<div class="pop">
+    <div class="pop-top">
+        <h2></h2>
+        <span class="pop-close" onclick="b()">Ｘ</span>
+    </div>
+    <div class="pop-content">
+        <div class="pop-content-left">
+            <img src="" alt="" class="teathumb">
+        </div>
+        <div class="pop-content-right">
+            <label>添加航班</label><br>
+            <table align="center">
+                <tr>
+                    <td>航班号码：<input name="flightId1"/></td>
+                </tr>
+                <tr>
+                    <td>出发地点：
+                        <select name="start1" cssStyle="size: 50px">
+                            <option value="上海">上海</option>
+                            <option value="北京">北京</option>
+                            <option value="广州">广州</option>
+                            <option value="武汉">武汉</option>
+                            <option value="深圳">深圳</option>
+                            <option value="成都">成都</option>
+                            <option value="重庆">重庆</option>
+                            <option value="杭州">杭州</option>
+                            <option value="西安">西安</option>
+                            <option value="天津">天津</option>
+                            <option value="郑州">郑州</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>目的地点：
+                        <select name="end1" cssStyle="size: 50px">
+                            <option value="上海">上海</option>
+                            <option value="北京">北京</option>
+                            <option value="广州">广州</option>
+                            <option value="武汉">武汉</option>
+                            <option value="深圳">深圳</option>
+                            <option value="成都">成都</option>
+                            <option value="重庆">重庆</option>
+                            <option value="杭州">杭州</option>
+                            <option value="西安">西安</option>
+                            <option value="天津">天津</option>
+                            <option value="郑州">郑州</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>航班日期：<input name="date1" type="date"/></td>
+                </tr>
+                <tr>
+                    <td>起飞时间：<input name="starttime1"/></td>
+                </tr>
+                <tr>
+                    <td>到达时间：<input name="endtime1"/></td>
+                </tr>
+                <tr>
+                    <td>候机地点：<input name="waitsite1"/></td>
+                </tr>
+                <tr>
+                    <td>飞机类型：<input name="fltype1"/></td>
+                </tr>
+                <tr>
+                    <td>经济票价：<input name="lowprice1"/></td>
+                </tr>
+                <tr>
+                    <td>头等票价：<input name="topprice1"/></td>
+                </tr>
+            </table>
+            <br><br>
+            <div class="pop-foot">
+                <input type="button" value="关闭" class="pop-cancel pop-close" onclick="b()">
+                <input type="button" value="添加" class="pop-ok" id="add">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pop1">
+    <div class="pop-top">
+        <h2></h2>
+        <span class="pop-close" onclick="c()">Ｘ</span>
+    </div>
+    <div class="pop-content">
+        <div class="pop-content-left">
+            <img src="" alt="" class="teathumb">
+        </div>
+        <div class="pop-content-right">
+            <label>修改航班</label><br>
+            <table align="center">
+                <tr>
+                    <td>航班号码：<input name="flightId2" id="fli2"/></td>
+                </tr>
+                <tr>
+                    <td>出发地点：
+                        <select name="start2" cssStyle="size: 50px">
+                            <option value="上海">上海</option>
+                            <option value="北京">北京</option>
+                            <option value="广州">广州</option>
+                            <option value="武汉">武汉</option>
+                            <option value="深圳">深圳</option>
+                            <option value="成都">成都</option>
+                            <option value="重庆">重庆</option>
+                            <option value="杭州">杭州</option>
+                            <option value="西安">西安</option>
+                            <option value="天津">天津</option>
+                            <option value="郑州">郑州</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>目的地点：
+                        <select name="end2" cssStyle="size: 50px">
+                            <option value="上海">上海</option>
+                            <option value="北京">北京</option>
+                            <option value="广州">广州</option>
+                            <option value="武汉">武汉</option>
+                            <option value="深圳">深圳</option>
+                            <option value="成都">成都</option>
+                            <option value="重庆">重庆</option>
+                            <option value="杭州">杭州</option>
+                            <option value="西安">西安</option>
+                            <option value="天津">天津</option>
+                            <option value="郑州">郑州</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>航班日期：<input name="date2" type="date"/></td>
+                </tr>
+                <tr>
+                    <td>起飞时间：<input name="starttime2"/></td>
+                </tr>
+                <tr>
+                    <td>到达时间：<input name="endtime2"/></td>
+                </tr>
+                <tr>
+                    <td>候机地点：<input name="waitsite2"/></td>
+                </tr>
+                <tr>
+                    <td>飞机类型：<input name="fltype2"/></td>
+                </tr>
+                <tr>
+                    <td>经济票价：<input name="lowprice2"/></td>
+                </tr>
+                <tr>
+                    <td>头等票价：<input name="topprice2"/></td>
+                </tr>
+            </table>
+            <br><br>
+            <div class="pop-foot">
+                <input type="button" value="关闭" class="pop-cancel pop-close" onclick="c()">
+                <input type="button" value="更新" class="pop-ok" id="update">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pop2">
+    <div class="pop-top">
+        <h2></h2>
+        <span class="pop-close" onclick="d()">Ｘ</span>
+    </div>
+    <div class="pop-content">
+        <div class="pop-content-left">
+            <img src="" alt="" class="teathumb">
+        </div>
+        <div class="pop-content-right">
+            <table align="center">
+                <tr>
+                    <td>航班号码：<label id="1"></label></td>
+                </tr>
+                <tr>
+                    <td>出发地点：<label id="2"></label></td>
+                </tr>
+                <tr>
+                    <td>目的地点：<label id="3"></label></td>
+                </tr>
+                <tr>
+                    <td>航班日期：<label id="4"></label></td>
+                </tr>
+                <tr>
+                    <td>起飞时间：<label id="5"></label></td>
+                </tr>
+                <tr>
+                    <td>到达时间：<label id="6"></label></td>
+                </tr>
+                <tr>
+                    <td>候机地点：<label id="7"></label></td>
+                </tr>
+                <tr>
+                    <td>飞机类型：<label id="8"></label></td>
+                </tr>
+                <tr>
+                    <td>经济票价：<label id="9"></label></td>
+                </tr>
+                <tr>
+                    <td>头等票价：<label id="10"></label></td>
+                </tr>
+            </table>
+            <br><br>
+            <div class="pop-foot">
+                <input type="button" value="关闭" class="pop-cancel pop-close" onclick="d()">
+                <input type="button" value="更新" class="pop-ok" id="update1">
+                <input type="button" value="删除" class="pop-ok" id="delete1">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.onload=function (){
+        var page = sessionStorage.getItem("currentpage");
+        var str={
+            "page" : page
+        };
+        $.ajax({
+            url : "http://localhost:8080/flight/showflight",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                $str = '';
+                $.each(datas.pagemess.list,function(i,val){
+                    $str = $str + '<tr>';
+                    $str = $str + '<td id="td1">'+val.flightId+'  </td>';
+                    $str = $str + '<td>'+val.start+'  </td>';
+                    $str = $str + '<td>'+val.end+'  </td>';
+                    $str = $str + '<td>'+val.date+'  </td>';
+                    $str = $str + '<td>'+val.starttime+'  </td>';
+                    $str = $str + '<td>'+val.endtime+'  </td>';
+                    $str = $str + '<td>'+val.waitsite+'  </td>';
+                    $str = $str + '<td>'+val.fltype+'  </td>';
+                    $str = $str + '<td>'+val.lowprice+'  </td>';
+                    $str = $str + '<td>'+val.topprice+'  </td>';
+                    $str = $str + '<td><input type="radio" name="fid1"value="'+val.flightId+'"/></td>'
+                    $str = $str + '</tr>';
+                });
+                $('#t1').append($str);
+                sessionStorage.setItem("currentpage",datas.pagemess.currPage);
+                sessionStorage.setItem("totalpage",datas.pagemess.totalPage);
+                document.getElementById('s1').innerHTML = "第"+datas.pagemess.currPage+"/"+ datas.pagemess.totalPage+"页";
+                document.getElementById('s2').innerHTML ="总记录数："+datas.pagemess.totalCount+",每页显示:"+datas.pagemess.pageSize
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    $("#logout").click(function() {
+        var userId = sessionStorage.getItem("userId");
+        var str={
+            "userId" : userId
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/logout",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "login.html";
+            }
+        });
+
+    })
+</script>
+<script type="text/javascript">
+    $("#a1").click(function() {
+        $('.bgPop,.pop').show();
+    });
+    $("#a3").click(function() {
+        var flightId = $("[name=fid1]:checked").val();
+        document.getElementById('fli2').value = flightId;
+        $('.bgPop,.pop1').show();
+    });
+    $("#update1").click(function() {
+        $('.bgPop,.pop2').hide();
+        var flightId = document.getElementById("1").innerText;
+        alert(flightId);
+        document.getElementById('fli2').value = flightId;
+        $('.bgPop,.pop1').show();
+    });
+    function b() {
+        $('.bgPop,.pop').hide();
+    }
+    function c() {
+        $('.bgPop,.pop1').hide();
+    }
+    function d() {
+        $('.bgPop,.pop2').hide();
+    }
+</script>
+<script type="text/javascript">
+    $("#a2").click(function() {
+        var flightId = $("[name=fid1]:checked").val();
+        var r = confirm("是否确定删除该航班");
+        if (r == true) {
+            var str={
+                "flightid" : flightId
+            };
+            /* ajax请求 */
+            $.ajax({
+                url : "http://localhost:8080/flight/deleteflight",
+                type : "post",
+                contentType:'application/json;charset=utf-8',
+                dataType:'json',
+                data: JSON.stringify(str),
+                success : function(datas) {
+                    window.location.href = "managerf.html";
+                }
+            });
+        } else {
+            alert("取消删除");
+        }
+    })
+</script>
+<script type="text/javascript">
+    $("#delete1").click(function() {
+        var flightId = document.getElementById("1").innerText;
+        var r = confirm("是否确定删除该航班");
+        if (r == true) {
+            var str={
+                "flightid" : flightId
+            };
+            /* ajax请求 */
+            $.ajax({
+                url : "http://localhost:8080/flight/deleteflight",
+                type : "post",
+                contentType:'application/json;charset=utf-8',
+                dataType:'json',
+                data: JSON.stringify(str),
+                success : function(datas) {
+                    window.location.href = "managerf.html";
+                }
+            });
+        } else {
+            alert("取消删除");
+        }
+    })
+</script>
+<script type="text/javascript">
+    $("#a4").click(function() {
+
+        var flightId = $("[name=flight]").val();
+        var str={
+            "flightId" : flightId
+        };
+        alert(flightId);
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/findflight",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+
+                document.getElementById('1').innerHTML=datas.flight.flightId;
+                document.getElementById('2').innerHTML=datas.flight.start;
+                document.getElementById('3').innerHTML=datas.flight.end;
+                document.getElementById('4').innerHTML=datas.flight.date;
+                document.getElementById('5').innerHTML=datas.flight.starttime;
+                document.getElementById('6').innerHTML=datas.flight.endtime;
+                document.getElementById('7').innerHTML=datas.flight.waitsite;
+                document.getElementById('8').innerHTML=datas.flight.fltype;
+                document.getElementById('9').innerHTML=datas.flight.lowprice;
+                document.getElementById('10').innerHTML=datas.flight.topprice;
+                $('.bgPop,.pop2').show();
+            }
+        });
+    })
+</script>
+<script type="text/javascript">
+    $("#add").click(function() {
+        var flightId = $("[name=flightId1]").val();
+        var start = $("[name=start1]").val();
+        var end = $("[name=end1]").val();
+        var date = $("[name=date1]").val();
+        var starttime = $("[name=starttime1]").val();
+        var endtime = $("[name=endtime1]").val();
+        var waitsite = $("[name=waitsite1]").val();
+        var fltype = $("[name=fltype1]").val();
+        var lowprice = $("[name=lowprice1]").val();
+        var topprice = $("[name=topprice1]").val();
+        var str={
+            "flightId" : flightId,
+            "start" : start,
+            "end" : end,
+            "starttime" : starttime,
+            "endtime" : endtime,
+            "date" : date,
+            "waitsite" : waitsite,
+            "lowprice" : lowprice,
+            "topprice" : topprice,
+            "flighttype" : fltype
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/addflight",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "managerf.html";
+            }
+        });
+    })
+</script>
+<script type="text/javascript">
+    $("#update").click(function() {
+        var flightId = $("[name=flightId2]").val();
+        var start = $("[name=start2]").val();
+        var end = $("[name=end2]").val();
+        var date = $("[name=date2]").val();
+        var starttime = $("[name=starttime2]").val();
+        var endtime = $("[name=endtime2]").val();
+        var waitsite = $("[name=waitsite2]").val();
+        var fltype = $("[name=fltype2]").val();
+        var lowprice = $("[name=lowprice2]").val();
+        var topprice = $("[name=topprice2]").val();
+        var str={
+            "flightId" : flightId,
+            "start" : start,
+            "end" : end,
+            "starttime" : starttime,
+            "endtime" : endtime,
+            "date" : date,
+            "waitsite" : waitsite,
+            "lowprice" : lowprice,
+            "topprice" : topprice,
+            "flighttype" : fltype
+        };
+        /* ajax请求 */
+        $.ajax({
+            url : "http://localhost:8080/flight/editflight",
+            type : "post",
+            contentType:'application/json;charset=utf-8',
+            dataType:'json',
+            data: JSON.stringify(str),
+            success : function(datas) {
+                window.location.href = "managerf.html";
+            }
+        });
+    })
+</script>
+<script type="text/javascript">
+    $("#gorecord").click(function() {
+        window.location.href = "managerrecord.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#golog").click(function() {
+        window.location.href = "managerlog.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#gofirst").click(function() {
+        sessionStorage.setItem("currentpage",1);
+        window.location.href = "managerf.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#gopri").click(function() {
+        var page = sessionStorage.getItem("currentpage");
+        if(page==1){
+            alert("已经是首页了");
+            return;
+        }
+        else
+        {
+            sessionStorage.setItem("currentpage",page-1);
+            window.location.href = "managerf.html";
+        }
+    })
+</script>
+<script type="text/javascript">
+    $("#gonext").click(function() {
+        var page = parseInt(sessionStorage.getItem("currentpage"));
+        var page2 = parseInt(sessionStorage.getItem("totalpage"));
+        if(page==page2){
+            alert("已经是尾页了");
+            return;
+        }
+        else
+        {
+            sessionStorage.setItem("currentpage",page+1);
+            window.location.href = "managerf.html";
+        }
+    })
+</script>
+<script type="text/javascript">
+    $("#golast").click(function() {
+        var page2 = sessionStorage.getItem("totalpage");
+        sessionStorage.setItem("currentpage",page2);
+        window.location.href = "managerf.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#jump").click(function() {
+        var page =$("[name=currentPage]").val();
+        sessionStorage.setItem("currentpage",page);
+        window.location.href = "managerf.html";
+    })
+</script>
+<script type="text/javascript">
+    $("#gotest").click(function() {
+        window.location.href = "test.html";
+    })
+</script>
+</body>
+
+</html>
